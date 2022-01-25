@@ -51,8 +51,10 @@ class TapExecutor:
 
     def discover(self):
         catalog = [stream().generate_catalog() for stream in self.streams]
+        streams = {'streams': catalog}
 
-        return json.dump({'streams': catalog}, sys.stdout, indent=4)
+        json.dump(streams, sys.stdout, indent=4)
+        return streams
 
     def sync(self):
         self.set_catalog()
@@ -85,8 +87,7 @@ class TapExecutor:
         return get_res_data(res.json(), key)
 
     def set_catalog(self):
-        self.catalog = Catalog.from_dict(self.args.properties) \
-            if self.args.properties else self.discover()
+        self.catalog = self.args.catalog if self.args.catalog else self.discover()
 
         self.selected_catalog = [s for s in self.catalog.streams
                                  if stream_is_selected(s)]
